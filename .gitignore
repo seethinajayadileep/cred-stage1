@@ -4,7 +4,7 @@
 # Local provider plugins / modules cache
 .terraform/
 .terraform.lock.hcl
-
+.env
 # State files (may contain secrets in plaintext, e.g. DB passwords)
 *.tfstate
 *.tfstate.*
