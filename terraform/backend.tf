@@ -1,9 +1,9 @@
-
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "CredProj"
-    storage_account_name = "credprojstate"
-    container_name       = "statefile"
-    key                  = "credpay.terraform.tfstate"
-  }
+terraform{
+    backend "azurerm"{
+        resource_group_name = "credRg"
+        storage_account_name = "credpayprojectjaya"
+        container_name="statefile"
+        key="credpay.teraform.tfstate"
+        
+    }
 }
