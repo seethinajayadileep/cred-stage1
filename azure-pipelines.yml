@@ -35,4 +35,15 @@ stages:
         backendAzureRmStorageAccountName: 'credpayprojectjaya'
         backendAzureRmContainerName: 'statefile'
         backendAzureRmKey: 'credpay.teraform.tfstate'
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: terraform
+        backendServiceArm: 'hdfcauto'
+        backendAzureRmOverrideSubscriptionID: 'e12f710f-4779-4738-bbb9-6b2e658c69f2'
+        backendAzureRmResourceGroupName: 'credRg'
+        backendAzureRmStorageAccountName: 'credpayprojectjaya'
+        backendAzureRmContainerName: 'statefile'
+        backendAzureRmKey: 'credpay.teraform.tfstate'
 
