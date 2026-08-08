@@ -1,65 +1,38 @@
-#pipeline code
-
-pool:
-  vmImage: ubuntu-latest
-
-variables:
-  acrServiceConnection: 'acrserviceconnection'
-  frontendRepository: 'credpay/frontend'
-  userRepository: 'credpay/user-service'
-  paymentRepository: 'credpay/payment-service'
-  tag: '$(Build.BuildId)'
-
 stages:
 
-- stage: DockerBuild
-  displayName: Docker Build & Push
+- stage: terraform
+  displayName: terraform infra
   jobs:
 
-  - job: BuildPushImages
-    displayName: Build Docker Images
+  - job: terraformapply
+    displayName: terraform apply and init
 
     steps:
     - checkout: self
 
-
-    - task: Docker@2
-      displayName: Build & Push Frontend Image
+    - task: TerraformInstaller@1
       inputs:
-        command: buildAndPush
-        containerRegistry: 'acr service connection'
-        repository: $(frontendRepository)
-        dockerfile: frontend-react/Dockerfile
-        buildContext: frontend-react
+        terraformVersion: 'latest'
 
-        tags: |
-          $(tag)
-          latest
-
-
-    - task: Docker@2
-      displayName: Build & Push User Service Image
+    # 1. Terraform Init
+    - task: TerraformTask@5
+      displayName: 'Terraform Init'
       inputs:
-        command: buildAndPush
-        containerRegistry: 'acr service connection'
-        repository: $(userRepository)
-        dockerfile: user-service/dockerfile
-        buildContext: user-service
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: 'terraform'
+        backendServiceArm: 'hdfcauto'
+        backendAzureRmResourceGroupName: 'credRg'
+        backendAzureRmStorageAccountName: 'credpayprojectjaya'
+        backendAzureRmContainerName: 'statefile'
+        backendAzureRmKey: 'credpay.teraform.tfstate'
 
-        tags: |
-          $(tag)
-          latest
-
-
-    - task: Docker@2
-      displayName: Build & Push Payment Service Image
+    # 2. Terraform Plan
+    - task: TerraformTask@5
+      displayName: 'Terraform Plan'
       inputs:
-        command: buildAndPush
-        containerRegistry: 'acr service connection'
-        repository: $(paymentRepository)
-        dockerfile: payment-service/dockerfile
-        buildContext: payment-service
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: 'terraform'
+        environmentServiceNameAzureRM: 'hdfcauto'
 
-        tags: |
-          $(tag)
-          latest
