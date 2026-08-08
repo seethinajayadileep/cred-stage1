@@ -1,15 +1,3 @@
-#pipeline code
-
-pool:
-  vmImage: ubuntu-latest
-
-variables:
-  acrServiceConnection: 'acrserviceconnection'
-  frontendRepository: 'credpay/frontend'
-  userRepository: 'credpay/user-service'
-  paymentRepository: 'credpay/payment-service'
-  tag: '$(Build.BuildId)'
-
 stages:
 
 - stage: terraform
@@ -21,29 +9,30 @@ stages:
 
     steps:
     - checkout: self
+
     - task: TerraformInstaller@1
       inputs:
         terraformVersion: 'latest'
+
+    # 1. Terraform Init
     - task: TerraformTask@5
+      displayName: 'Terraform Init'
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: terraform
+        workingDirectory: 'terraform'
         backendServiceArm: 'hdfcauto'
-        backendAzureRmOverrideSubscriptionID: 'e12f710f-4779-4738-bbb9-6b2e658c69f2'
         backendAzureRmResourceGroupName: 'credRg'
         backendAzureRmStorageAccountName: 'credpayprojectjaya'
         backendAzureRmContainerName: 'statefile'
         backendAzureRmKey: 'credpay.teraform.tfstate'
+
+    # 2. Terraform Plan
     - task: TerraformTask@5
+      displayName: 'Terraform Plan'
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        workingDirectory: terraform
-        backendServiceArm: 'hdfcauto'
-        backendAzureRmOverrideSubscriptionID: 'e12f710f-4779-4738-bbb9-6b2e658c69f2'
-        backendAzureRmResourceGroupName: 'credRg'
-        backendAzureRmStorageAccountName: 'credpayprojectjaya'
-        backendAzureRmContainerName: 'statefile'
-        backendAzureRmKey: 'credpay.teraform.tfstate'
+        workingDirectory: 'terraform'
+        environmentServiceNameAzureRM: 'hdfcauto'
 
