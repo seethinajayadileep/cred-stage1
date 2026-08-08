@@ -42,5 +42,12 @@ stages:
         command: 'apply'
         workingDirectory: 'terraform'
         environmentServiceNameAzureRM: 'hdfcauto'
+    - task: TerraformTask@5
+      displayName: 'Terraform Plan'
+      inputs:
+        provider: 'azurerm'
+        command: 'destroy'
+        workingDirectory: 'terraform'
+        environmentServiceNameAzureRM: 'hdfcauto'
 
 
