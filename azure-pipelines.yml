@@ -12,54 +12,27 @@ variables:
 
 stages:
 
-- stage: DockerBuild
-  displayName: Docker Build & Push
+- stage: terraform
+  displayName: terraform infra
   jobs:
 
-  - job: BuildPushImages
-    displayName: Build Docker Images
+  - job: terraformapply
+    displayName: terraform apply and init
 
     steps:
     - checkout: self
-
-
-    - task: Docker@2
-      displayName: Build & Push Frontend Image
+    - task: TerraformInstaller@1
       inputs:
-        command: buildAndPush
-        containerRegistry: 'acr service connection'
-        repository: $(frontendRepository)
-        dockerfile: frontend-react/Dockerfile
-        buildContext: frontend-react
-
-        tags: |
-          $(tag)
-          latest
-
-
-    - task: Docker@2
-      displayName: Build & Push User Service Image
+        terraformVersion: 'latest'
+    - task: TerraformTask@5
       inputs:
-        command: buildAndPush
-        containerRegistry: 'acr service connection'
-        repository: $(userRepository)
-        dockerfile: user-service/dockerfile
-        buildContext: user-service
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: terraform
+        backendServiceArm: 'hdfcauto'
+        backendAzureRmOverrideSubscriptionID: 'e12f710f-4779-4738-bbb9-6b2e658c69f2'
+        backendAzureRmResourceGroupName: 'credRg'
+        backendAzureRmStorageAccountName: 'credpayprojectjaya'
+        backendAzureRmContainerName: 'statefile'
+        backendAzureRmKey: 'credpay.teraform.tfstate'
 
-        tags: |
-          $(tag)
-          latest
-
-
-    - task: Docker@2
-      displayName: Build & Push Payment Service Image
-      inputs:
-        command: buildAndPush
-        containerRegistry: 'acr service connection'
-        repository: $(paymentRepository)
-        dockerfile: payment-service/dockerfile
-        buildContext: payment-service
-
-        tags: |
-          $(tag)
-          latest
